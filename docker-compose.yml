@@ -1,0 +1,34 @@
+services:
+  db:
+    image: pgvector/pgvector:0.6.2-pg15
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: talkdai
+      POSTGRES_PASSWORD: talkdai
+      POSTGRES_DB: talkdai
+    volumes:
+       - ./etc/db-extensions.sql:/docker-entrypoint-initdb.d/db-extensions.sql
+       - ./data/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "talkdai", "-U", "talkdai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  dialog:
+    image: ghcr.io/talkdai/dialog:latest
+    volumes:
+      - ./data/:/app/data/
+    ports:
+      - '8000:8000'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - PORT=8000
+      - DATABASE_URL=postgresql://talkdai:talkdai@db:5432/talkdai
+      - OPENAI_API_KEY=sk-your-openai-api-key
+      - STATIC_FILE_LOCATION=/app/static
+      - DIALOG_DATA_PATH=../data/your.csv
+      - PROJECT_CONFIG=../data/your.toml

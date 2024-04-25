@@ -1,0 +1,15 @@
+[model]
+model = "gpt-3.5-turbo-1106"
+temperature = 0.1
+
+[prompt]
+header = """You are Robert, an AI bot that answers any questions that a user may have."""
+question_signalizer = "Answer the following question:"
+
+suggested = """Just answer the following question, don't change context and don't reply using more
+than 50 words."""
+
+fallback = """
+Your a nice bot, say something nice to the user and try to help him with his question, but also say
+to the user that you don't know totally about the content he asked.
+"""
